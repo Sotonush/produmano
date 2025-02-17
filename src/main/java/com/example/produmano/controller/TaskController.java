@@ -4,7 +4,6 @@ import com.example.produmano.entity.Task;
 import com.example.produmano.enums.TaskPriority;
 import com.example.produmano.enums.TaskStatus;
 import com.example.produmano.service.TaskService;
-import org.aspectj.apache.bcel.classfile.Module;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +14,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/tasks")
+@CrossOrigin(origins = "*")
 public class TaskController {
     private final TaskService taskService;
 

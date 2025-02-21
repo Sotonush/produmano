@@ -55,5 +55,8 @@ public class Client {
     protected void onCreate() {
         this.registrationDate = LocalDate.now();
     }
+
+    @Column(nullable = false, length = 100, unique = true)
+    private String telegramChatId;
 }
 

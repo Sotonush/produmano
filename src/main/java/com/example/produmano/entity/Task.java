@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -29,7 +30,7 @@ public class Task {
     private String description;
 
     private LocalDate startDate;
-    private LocalDate endDate;
+    private LocalDateTime endDate;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)

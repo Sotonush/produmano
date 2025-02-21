@@ -23,4 +23,6 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
     List<Client> findByServiceType(ServiceType serviceType);
 
     List<Client> findByNameIgnoreCase(String name);
+
+
 }

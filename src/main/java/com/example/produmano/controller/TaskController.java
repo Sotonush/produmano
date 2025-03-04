@@ -7,6 +7,8 @@ import com.example.produmano.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,9 +26,9 @@ public class TaskController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Task>> getAllTask() {
-        List<Task> tasks = taskService.getAllTasks();
-        return new ResponseEntity<>(tasks, HttpStatus.OK);
+    public ResponseEntity<String> getTasks(@AuthenticationPrincipal Jwt jwt) {
+        String username = jwt.getClaim("preferred_username");
+        return ResponseEntity.ok("Задачи для пользователя: " + username);
     }
 
     @GetMapping("/{id}")
@@ -76,8 +78,11 @@ public class TaskController {
         List<Task> tasks = taskService.findByStatus(status);
         return ResponseEntity.ok(tasks);
     }
-
-
+    @PostMapping
+    public ResponseEntity<Task> createTask(@RequestBody Task task) {
+        Task createdTask = taskService.createTask(task);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdTask);
+    }
 }
 //Создание, удаление, обновление, найти задачу по клиенту,
 //Найти по приеритету,найти по обязанному, найти по статусу. Найти по айди

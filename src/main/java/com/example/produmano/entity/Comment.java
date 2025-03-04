@@ -20,11 +20,13 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private Long userId;
+    @ManyToOne
+    @JoinColumn(name = "employee_id", nullable = false)
+    private Employee employee;
 
-    @Column(nullable = false)
-    private Long entityId;
+    @ManyToOne
+    @JoinColumn(name = "task_id", nullable = false)
+    private Task task;
 
     @Column(nullable = false, length = 1000)
     private String text;
@@ -41,3 +43,4 @@ public class Comment {
     @Enumerated(EnumType.STRING)
     private CommentPriority priority;
 }
+

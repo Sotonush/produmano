@@ -25,18 +25,20 @@ public class ClientController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('EMPLOYEE')")
     public ResponseEntity<List<Client>> getAllClients() {
         List<Client> clients = clientService.getAllClients();
         return new ResponseEntity<>(clients, HttpStatus.OK);
     }
 
     @PostMapping("/createClient")
-    @PreAuthorize("hasRole('MANAGER')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Client> createClient(@RequestBody Client client) {
         Client createdClient = clientService.createClient(client);
         return ResponseEntity.ok(createdClient);
     }
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('EMPLOYEE')")
     public ResponseEntity<Optional<Client>> getClientById(@PathVariable Long id) {
         try{
             Optional<Client> client = clientService.getClientById(id);
@@ -46,12 +48,14 @@ public class ClientController {
         }
     }
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('MANAGER')")
     public ResponseEntity<Client> updateClient(@PathVariable Long id, @RequestBody Client updateClient){
         Client client = clientService.updateClient( id, updateClient);
         return ResponseEntity.ok(client);
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteClient(@PathVariable Long id) {
         boolean deleted = clientService.deleteClient(id);
         if(deleted) {

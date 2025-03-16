@@ -4,10 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-
+import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
 @Service
 @RequiredArgsConstructor
@@ -48,6 +49,34 @@ public class TelegramNotificationService extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
+        if (update.hasMessage()) {
+            if (update.getMessage().getNewChatMembers() != null) {
+                update.getMessage().getNewChatMembers().forEach(user -> {
+                    if (user.getUserName().equals(getBotUsername())) {
+                        String chatId = update.getMessage().getChatId().toString();
+                        sendNotification(chatId, "Привет, я бот! Рад присоединиться к группе!");
+                    }
+                });
+            }
 
+            if (update.getMessage().getText() != null) {
+                String messageText = update.getMessage().getText();
+
+                if (messageText.equals("/start")) {
+                    String chatId = update.getMessage().getChatId().toString();
+                    sendNotification(chatId, "Привет, я бот, и я могу писать в эту группу!");
+                }
+            }
+        }
+    }
+
+
+    public void start() {
+        try {
+            TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
+            botsApi.registerBot(this);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
     }
 }

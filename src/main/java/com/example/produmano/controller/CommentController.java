@@ -1,6 +1,8 @@
 package com.example.produmano.controller;
 
 import com.example.produmano.entity.Comment;
+import com.example.produmano.entity.Employee;
+import com.example.produmano.entity.Task;
 import com.example.produmano.enums.CommentPriority;
 import com.example.produmano.enums.CommentType;
 import com.example.produmano.service.CommentService;
@@ -20,13 +22,13 @@ public class CommentController {
 
     @PostMapping("/create")
     public ResponseEntity<Comment> createComment(
-            @RequestParam Long userId,
-            @RequestParam Long entityId,
+            @RequestParam Employee employee,
+            @RequestParam Task task,
             @RequestParam String text,
             @RequestParam CommentType type,
             @RequestParam(required = false) Long parentCommentId,
             @RequestParam CommentPriority priority) {
-        Comment comment = commentService.createComment(userId, entityId, text, type, parentCommentId, priority);
+        Comment comment = commentService.createComment(employee, task, text, type, parentCommentId, priority);
         return ResponseEntity.ok(comment);
     }
 
@@ -37,13 +39,13 @@ public class CommentController {
     }
 
     @GetMapping("/entity/{entityId}")
-    public ResponseEntity<List<Comment>> getCommentsByEntityId(@PathVariable Long entityId) {
-        return ResponseEntity.ok(commentService.getCommentsByEntityId(entityId));
+    public ResponseEntity<List<Comment>> getCommentsByEntityId(@PathVariable Task task) {
+        return ResponseEntity.ok(commentService.getCommentsByTask(task));
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Comment>> getCommentsByUserId(@PathVariable Long userId) {
-        return ResponseEntity.ok(commentService.getCommentsByUserId(userId));
+    public ResponseEntity<List<Comment>> getCommentsByUserId(@PathVariable Employee employee) {
+        return ResponseEntity.ok(commentService.getCommentsByEmployee(employee));
     }
 
     @PutMapping("/update/{id}")

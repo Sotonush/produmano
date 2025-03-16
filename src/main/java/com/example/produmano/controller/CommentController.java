@@ -22,7 +22,7 @@ public class CommentController {
     private final CommentService commentService;
 
     @PostMapping("/create")
-    @PreAuthorize("hasRole('EMPLOYEE')")
+    @PreAuthorize("hasRole('EMPLOYEE') or hasRole('MANAGER') or hasRole('ADMIN')")
     public ResponseEntity<Comment> createComment(
             @RequestParam Employee employee,
             @RequestParam Task task,
@@ -35,14 +35,14 @@ public class CommentController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('EMPLOYEE')")
+    @PreAuthorize("hasRole('EMPLOYEE') or hasRole('MANAGER') or hasRole('ADMIN')")
     public ResponseEntity<Comment> getCommentById(@PathVariable Long id) {
         Optional<Comment> comment = commentService.getCommentById(id);
         return comment.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @GetMapping("/entity/{entityId}")
-    @PreAuthorize("hasRole('MANAGER')")
+    @PreAuthorize("hasRole('MANAGER') or hasRole('ADMIN')")
     public ResponseEntity<List<Comment>> getCommentsByEntityId(@PathVariable Task task) {
         return ResponseEntity.ok(commentService.getCommentsByTask(task));
     }
@@ -54,7 +54,7 @@ public class CommentController {
     }
 
     @PutMapping("/update/{id}")
-    @PreAuthorize("hasRole('EMPLOYEE')")
+    @PreAuthorize("hasRole('EMPLOYEE') or hasRole('MANAGER') or hasRole('ADMIN')")
     public ResponseEntity<Comment> updateComment(
             @PathVariable Long id,
             @RequestParam String newText,
@@ -63,20 +63,20 @@ public class CommentController {
     }
 
     @DeleteMapping("/delete/{id}")
-    @PreAuthorize("hasRole('EMPLOYEE')")
+    @PreAuthorize("hasRole('EMPLOYEE') or hasRole('MANAGER') or hasRole('ADMIN')")
     public ResponseEntity<Void> deleteComment(@PathVariable Long id) {
         commentService.deleteComment(id);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/sorted/priority")
-    @PreAuthorize("hasRole('MANAGER')")
+    @PreAuthorize("hasRole('MANAGER') or hasRole('ADMIN')")
     public ResponseEntity<List<Comment>> getCommentsSortedByPriority(@RequestParam CommentPriority priority) {
         return ResponseEntity.ok(commentService.getCommentsSortedByPriority(priority));
     }
 
     @GetMapping("/sorted/type")
-    @PreAuthorize("hasRole('MANAGER')")
+    @PreAuthorize("hasRole('MANAGER') or hasRole('ADMIN')")
     public ResponseEntity<List<Comment>> getCommentSortedByType(@RequestParam CommentType type) {
         return ResponseEntity.ok(commentService.getCommentSortedByType(type));
     }

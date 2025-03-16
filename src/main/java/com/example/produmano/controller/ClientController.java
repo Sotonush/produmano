@@ -25,7 +25,7 @@ public class ClientController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('EMPLOYEE')")
+    @PreAuthorize("hasRole('EMPLOYEE') or hasRole('MANAGER') or hasRole('ADMIN')")
     public ResponseEntity<List<Client>> getAllClients() {
         List<Client> clients = clientService.getAllClients();
         return new ResponseEntity<>(clients, HttpStatus.OK);
@@ -37,18 +37,17 @@ public class ClientController {
         Client createdClient = clientService.createClient(client);
         return ResponseEntity.ok(createdClient);
     }
+
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('EMPLOYEE')")
-    public ResponseEntity<Optional<Client>> getClientById(@PathVariable Long id) {
-        try{
-            Optional<Client> client = clientService.getClientById(id);
-            return ResponseEntity.ok(client);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound().build();
-        }
+    @PreAuthorize("hasRole('EMPLOYEE') or hasRole('MANAGER') or hasRole('ADMIN')")
+    public ResponseEntity<Client> getClientById(@PathVariable Long id) {
+        return clientService.getClientById(id)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
+
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('MANAGER')")
+    @PreAuthorize("hasRole('MANAGER') or hasRole('ADMIN')")
     public ResponseEntity<Client> updateClient(@PathVariable Long id, @RequestBody Client updateClient){
         Client client = clientService.updateClient( id, updateClient);
         return ResponseEntity.ok(client);
@@ -66,26 +65,31 @@ public class ClientController {
     }
 
     @GetMapping("/search/name")
+    @PreAuthorize("hasRole('EMPLOYEE') or hasRole('MANAGER') or hasRole('ADMIN')")
     public ResponseEntity<List<Client>> findByName(@RequestParam String name) {
         List<Client> clients = clientService.findByName(name);
         return ResponseEntity.ok(clients);
     }
     @GetMapping("/search/serviceType")
+    @PreAuthorize("hasRole('EMPLOYEE') or hasRole('MANAGER') or hasRole('ADMIN')")
     public ResponseEntity<List<Client>> findByServiceType(@RequestParam ServiceType serviceType) {
         List<Client> clients = clientService.findByServiceType(serviceType);
         return ResponseEntity.ok(clients);
     }
     @GetMapping("/search/status")
+    @PreAuthorize("hasRole('EMPLOYEE') or hasRole('MANAGER') or hasRole('ADMIN')")
     public ResponseEntity<List<Client>> findByStatus(@RequestParam ClientStatus status) {
         List<Client> clients = clientService.findByStatus(status);
         return ResponseEntity.ok(clients);
     }
     @GetMapping("/search/phone")
+    @PreAuthorize("hasRole('EMPLOYEE') or hasRole('MANAGER') or hasRole('ADMIN')")
     public ResponseEntity<Client> findByPhone(@RequestParam String phone) {
         Optional<Client> client = clientService.findByPhone(phone);
         return client.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
     @GetMapping("/search/email")
+    @PreAuthorize("hasRole('EMPLOYEE') or hasRole('MANAGER') or hasRole('ADMIN')")
     public ResponseEntity<Client> findByEmail(@RequestParam String email) {
         Optional<Client> client = clientService.findByEmail(email);
         return client.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());

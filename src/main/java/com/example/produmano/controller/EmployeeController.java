@@ -28,21 +28,21 @@ public class EmployeeController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('MANAGER')")
+    @PreAuthorize("hasRole('MANAGER') or hasRole('ADMIN')")
     public ResponseEntity<Employee> getEmployeeById(@PathVariable Long id) {
         Employee employee = employeeService.getEmployeeById(id);
         return new ResponseEntity<>(employee, HttpStatus.OK);
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('MANAGER')")
+    @PreAuthorize("hasRole('MANAGER') or hasRole('ADMIN')")
     public ResponseEntity<List<Employee>> getAllEmployees() {
         List<Employee> employees = employeeService.getAllEmployees();
         return new ResponseEntity<>(employees, HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('MANAGER')")
+    @PreAuthorize("hasRole('MANAGER') or hasRole('ADMIN')")
     public ResponseEntity<Employee> updateEmployee(
             @PathVariable Long id, @RequestBody Employee updatedEmployee) {
         Employee updated = employeeService.updateEmployee(id, updatedEmployee);
@@ -57,14 +57,14 @@ public class EmployeeController {
     }
 
     @GetMapping("/status/{status}")
-    @PreAuthorize("hasRole('MANAGER')")
+    @PreAuthorize("hasRole('MANAGER') or hasRole('ADMIN')")
     public ResponseEntity<List<Employee>> getEmployeesByStatus(@PathVariable String status) {
         List<Employee> employees = employeeService.getEmployeesByStatus(status);
         return new ResponseEntity<>(employees, HttpStatus.OK);
     }
 
     @GetMapping("/email/{email}")
-    @PreAuthorize("hasRole('MANAGER')")
+    @PreAuthorize("hasRole('MANAGER') or hasRole('ADMIN')")
     public ResponseEntity<Employee> getEmployeeByEmail(@PathVariable String email) {
         Optional<Employee> employee = employeeService.getEmployeeByEmail(email);
         return employee.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());

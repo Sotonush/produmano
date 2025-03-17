@@ -4,13 +4,16 @@ import com.example.produmano.entity.Client;
 import com.example.produmano.enums.ClientStatus;
 import com.example.produmano.enums.ServiceType;
 import com.example.produmano.service.ClientService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -33,10 +36,22 @@ public class ClientController {
 
     @PostMapping("/createClient")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Client> createClient(@RequestBody Client client) {
-        Client createdClient = clientService.createClient(client);
-        return ResponseEntity.ok(createdClient);
+    public ResponseEntity<?> createClient(@RequestBody @Valid Client client) {
+        try {
+            Client createdClient = clientService.createClient(client);
+            return ResponseEntity.ok(Map.of(
+                    "message", "Клиент успешно создан",
+                    "client", createdClient
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
+                    "error", "Ошибка создания клиента",
+                    "details", e.getMessage()
+            ));
+        }
     }
+
+
 
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('EMPLOYEE') or hasRole('MANAGER') or hasRole('ADMIN')")
@@ -70,6 +85,7 @@ public class ClientController {
         List<Client> clients = clientService.findByName(name);
         return ResponseEntity.ok(clients);
     }
+
     @GetMapping("/search/serviceType")
     @PreAuthorize("hasRole('EMPLOYEE') or hasRole('MANAGER') or hasRole('ADMIN')")
     public ResponseEntity<List<Client>> findByServiceType(@RequestParam ServiceType serviceType) {
@@ -95,3 +111,4 @@ public class ClientController {
         return client.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 }
+//поиск по телефону не работает, надо проверить

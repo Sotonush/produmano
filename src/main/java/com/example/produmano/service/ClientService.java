@@ -77,7 +77,10 @@ public class ClientService {
     }
 
     public Optional<Client> findByPhone(String phone) {
-        return clientRepository.findByPhone(phone);
+        System.out.println("🔍 Ищем клиента с телефоном: " + phone);
+        Optional<Client> client = clientRepository.findByPhone(phone);
+        System.out.println("📢 Найден клиент: " + client.orElse(null));
+        return client;
     }
 
     public List<Client> findByStatus(ClientStatus status) {

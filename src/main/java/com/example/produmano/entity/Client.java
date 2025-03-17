@@ -45,18 +45,19 @@ public class Client {
     @Column(nullable = false, length = 30)
     private ServiceType serviceType;
 
-    private LocalDate registrationDate;
+    @Column(nullable = false, updatable = false)
+    private LocalDate registrationDate = LocalDate.now();
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
     private ClientStatus status;
 
-    @PrePersist
-    protected void onCreate() {
-        this.registrationDate = LocalDate.now();
+    public void setPhone(String phone) {
+        this.phone = phone.replaceAll("[^\\d+]", "");
     }
 
-    @Column(nullable = false, length = 100, unique = true)
+
+    @Column(nullable=true, length = 100, unique = true)
     private String telegramChatId;
 }
 

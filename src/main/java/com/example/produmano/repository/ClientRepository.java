@@ -4,6 +4,8 @@ import com.example.produmano.entity.Client;
 import com.example.produmano.enums.ClientStatus;
 import com.example.produmano.enums.ServiceType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -16,7 +18,8 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
 
     Optional<Client> findByEmail(String email);
 
-    Optional<Client> findByPhone(String phone);
+    @Query("SELECT c FROM Client c WHERE REPLACE(c.phone, ' ', '') = REPLACE(:phone, ' ', '')")
+    Optional<Client> findByPhone(@Param("phone") String phone);
 
     List<Client> findByStatus(ClientStatus status);
 

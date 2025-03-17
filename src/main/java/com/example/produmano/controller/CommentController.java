@@ -81,3 +81,4 @@ public class CommentController {
         return ResponseEntity.ok(commentService.getCommentSortedByType(type));
     }
 }
+//надо проверить

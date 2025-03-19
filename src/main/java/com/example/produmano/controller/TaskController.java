@@ -4,6 +4,7 @@ import com.example.produmano.entity.Task;
 import com.example.produmano.enums.TaskPriority;
 import com.example.produmano.enums.TaskStatus;
 import com.example.produmano.service.TaskService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,20 +29,28 @@ public class TaskController {
 
     @GetMapping
     @PreAuthorize("hasRole('EMPLOYEE') or hasRole('MANAGER') or hasRole('ADMIN')")
-    public ResponseEntity<String> getTasks(@AuthenticationPrincipal Jwt jwt) {
-        String username = jwt.getClaim("preferred_username");
-        return ResponseEntity.ok("Задачи для пользователя: " + username);
+    public ResponseEntity<List<Task>> getAllTasks() {
+        List<Task> tasks = taskService.getAllTasks();
+
+        if (tasks.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(tasks);
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('EMPLOYEE') or hasRole('MANAGER') or hasRole('ADMIN')")
-    public ResponseEntity<Optional<Task>> getTaskById(@PathVariable Long id) {
-        try{
-            Optional<Task> task = taskService.getTaskById(id);
-            return ResponseEntity.ok(task);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound().build();
+    public ResponseEntity<?> getTaskById(@PathVariable Long id) {
+        Task task = taskService.getTaskById(id)
+                .orElse(null);
+
+        if (task == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Задача с ID " + id + " не найдена.");
         }
+
+        return ResponseEntity.ok(task);
     }
 
     @PutMapping("/{id}")
@@ -52,14 +61,11 @@ public class TaskController {
     }
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('EMPLOYEE') or hasRole('MANAGER') or hasRole('ADMIN')")
-    public ResponseEntity<Void> deleteTask(@PathVariable Long id){
+    public ResponseEntity<Void> deleteTask(@PathVariable Long id) {
         boolean deleted = taskService.deleteTask(id);
-        if (deleted) {
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
+
     @GetMapping("/search/client")
     @PreAuthorize("hasRole('EMPLOYEE') or hasRole('MANAGER') or hasRole('ADMIN')")
     public ResponseEntity<List<Task>> findTaskByClient(@RequestParam Long id) {
@@ -87,9 +93,9 @@ public class TaskController {
         List<Task> tasks = taskService.findByStatus(status);
         return ResponseEntity.ok(tasks);
     }
-    @PostMapping
+    @PostMapping("/createTask")
     @PreAuthorize("hasRole('EMPLOYEE') or hasRole('MANAGER') or hasRole('ADMIN')")
-    public ResponseEntity<Task> createTask(@RequestBody Task task) {
+    public ResponseEntity<Task> createTask(@Valid @RequestBody Task task) {
         Task createdTask = taskService.createTask(task);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdTask);
     }

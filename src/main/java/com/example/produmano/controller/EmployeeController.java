@@ -2,6 +2,7 @@ package com.example.produmano.controller;
 
 import com.example.produmano.entity.Employee;
 import com.example.produmano.service.EmployeeService;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,11 +21,15 @@ public class EmployeeController {
         this.employeeService = employeeService;
     }
 
-    @PostMapping
+    @PostMapping("/createEmployee")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Employee> createEmployee(@RequestBody Employee employee) {
-        Employee createdEmployee = employeeService.createEmployee(employee);
-        return new ResponseEntity<>(createdEmployee, HttpStatus.CREATED);
+    public ResponseEntity<?> createEmployee(@RequestBody Employee employee) {
+        try {
+            Employee createdEmployee = employeeService.createEmployee(employee);
+            return new ResponseEntity<>(createdEmployee, HttpStatus.CREATED);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 
     @GetMapping("/{id}")
@@ -43,11 +48,20 @@ public class EmployeeController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('MANAGER') or hasRole('ADMIN')")
-    public ResponseEntity<Employee> updateEmployee(
+    public ResponseEntity<?> updateEmployee(
             @PathVariable Long id, @RequestBody Employee updatedEmployee) {
-        Employee updated = employeeService.updateEmployee(id, updatedEmployee);
-        return new ResponseEntity<>(updated, HttpStatus.OK);
+        try {
+            Employee updated = employeeService.updateEmployee(id, updatedEmployee);
+            return new ResponseEntity<>(updated, HttpStatus.OK);
+        } catch (DataIntegrityViolationException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Ошибка: email, phone или telegramChatId уже существуют.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Ошибка при обновлении сотрудника.");
+        }
     }
+
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
@@ -63,9 +77,9 @@ public class EmployeeController {
         return new ResponseEntity<>(employees, HttpStatus.OK);
     }
 
-    @GetMapping("/email/{email}")
+    @GetMapping("/email")
     @PreAuthorize("hasRole('MANAGER') or hasRole('ADMIN')")
-    public ResponseEntity<Employee> getEmployeeByEmail(@PathVariable String email) {
+    public ResponseEntity<Employee> getEmployeeByEmail(@RequestParam String email) {
         Optional<Employee> employee = employeeService.getEmployeeByEmail(email);
         return employee.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }

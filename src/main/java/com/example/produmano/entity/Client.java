@@ -4,6 +4,7 @@ import com.example.produmano.enums.ClientStatus;
 import com.example.produmano.enums.ServiceType;
 
 import com.example.produmano.validation.PhoneNumber;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.*;
@@ -17,6 +18,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Client {
 
     @Id

@@ -18,8 +18,7 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
 
     Optional<Client> findByEmail(String email);
 
-    @Query("SELECT c FROM Client c WHERE REPLACE(c.phone, ' ', '') = REPLACE(:phone, ' ', '')")
-    Optional<Client> findByPhone(@Param("phone") String phone);
+    Optional<Client> findByPhone(String phone);
 
     List<Client> findByStatus(ClientStatus status);
 

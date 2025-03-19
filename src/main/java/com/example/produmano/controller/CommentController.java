@@ -6,6 +6,8 @@ import com.example.produmano.entity.Task;
 import com.example.produmano.enums.CommentPriority;
 import com.example.produmano.enums.CommentType;
 import com.example.produmano.service.CommentService;
+import com.example.produmano.service.EmployeeService;
+import com.example.produmano.service.TaskService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,18 +22,14 @@ import java.util.Optional;
 public class CommentController {
 
     private final CommentService commentService;
+    private final TaskService taskService;
+    private final EmployeeService employeeService;
 
     @PostMapping("/create")
     @PreAuthorize("hasRole('EMPLOYEE') or hasRole('MANAGER') or hasRole('ADMIN')")
-    public ResponseEntity<Comment> createComment(
-            @RequestParam Employee employee,
-            @RequestParam Task task,
-            @RequestParam String text,
-            @RequestParam CommentType type,
-            @RequestParam(required = false) Long parentCommentId,
-            @RequestParam CommentPriority priority) {
-        Comment comment = commentService.createComment(employee, task, text, type, parentCommentId, priority);
-        return ResponseEntity.ok(comment);
+    public ResponseEntity<Comment> createComment(@RequestBody Comment comment) {
+        Comment savedComment = commentService.createComment(comment);
+        return ResponseEntity.ok(savedComment);
     }
 
     @GetMapping("/{id}")
@@ -41,11 +39,12 @@ public class CommentController {
         return comment.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/entity/{entityId}")
-    @PreAuthorize("hasRole('MANAGER') or hasRole('ADMIN')")
-    public ResponseEntity<List<Comment>> getCommentsByEntityId(@PathVariable Task task) {
-        return ResponseEntity.ok(commentService.getCommentsByTask(task));
+    @GetMapping("/entity/{taskId}")
+    public ResponseEntity<List<Comment>> getCommentsByEntityId(@PathVariable Long taskId) {
+        Optional<Task> task = taskService.getTaskById(taskId);
+        return ResponseEntity.ok(commentService.getCommentsByTask(task.orElse(null)));
     }
+
 
     @GetMapping("/user/{userId}")
     @PreAuthorize("hasRole('EMPLOYEE')")

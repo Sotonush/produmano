@@ -20,16 +20,7 @@ public class CommentService {
 
     private final CommentRepository commentRepository;
 
-    public Comment createComment(Employee employee, Task task, String text, CommentType type, Long parentCommentId, CommentPriority priority) {
-        Comment comment = Comment.builder()
-                .employee(employee)
-                .task(task)
-                .text(text)
-                .createdAt(LocalDateTime.now())
-                .type(type)
-                .parentCommentId(parentCommentId)
-                .priority(priority)
-                .build();
+    public Comment createComment(Comment comment) {
         return commentRepository.save(comment);
     }
 

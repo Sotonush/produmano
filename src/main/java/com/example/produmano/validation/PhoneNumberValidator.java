@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 
 public class PhoneNumberValidator implements ConstraintValidator<PhoneNumber, String> {
 
-    private static final String PHONE_REGEX = "^\\+7\\d{10}$";
+    private static final String PHONE_REGEX = "^\\+7 \\d{3} \\d{3}-\\d{2}-\\d{2}$";
     private static final Pattern PATTERN = Pattern.compile(PHONE_REGEX);
 
     @Override
@@ -16,14 +16,6 @@ public class PhoneNumberValidator implements ConstraintValidator<PhoneNumber, St
 
     @Override
     public boolean isValid(String phone, ConstraintValidatorContext context) {
-        if (phone == null) {
-            return false;
-        }
-
-        String normalizedPhone = phone.replaceAll("[^\\d+]", "");
-
-        System.out.println("📞 Проверка номера: " + phone + " → " + normalizedPhone);
-
-        return PATTERN.matcher(normalizedPhone).matches();
+        return phone != null && PATTERN.matcher(phone).matches();
     }
 }

@@ -31,16 +31,22 @@ public class Comment {
     @Column(nullable = false, length = 1000)
     private String text;
 
-    @Column(nullable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private CommentType type;
 
-    private Long parentCommentId;
+    @ManyToOne
+    @JoinColumn(name = "parent_comment_id", nullable = true)
+    private Comment parentComment;
 
     @Enumerated(EnumType.STRING)
     private CommentPriority priority;
-}
 
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
+}

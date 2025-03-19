@@ -30,8 +30,12 @@ public class TaskService {
 
     @Transactional
     public Task createTask(Task task) {
+        Client client = clientRepository.findById(task.getClient().getId())
+                .orElseThrow(() -> new RuntimeException("Клиент не найден"));
+
         return taskRepository.save(task);
     }
+
 
     @Transactional
     public Task updateTask(Long id, Task updatedTask) {
@@ -68,11 +72,12 @@ public class TaskService {
     @Transactional
     public boolean deleteTask(Long id) {
         if (!taskRepository.existsById(id)) {
-            throw new RuntimeException("Task not found with id " + id);
+            return false;
         }
         taskRepository.deleteById(id);
-        return false;
+        return true;
     }
+
 
     public List<Task> findTaskByClient(Long id){
         return taskRepository.findByClientId(id);
